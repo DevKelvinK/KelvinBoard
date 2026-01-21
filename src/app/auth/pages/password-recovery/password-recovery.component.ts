@@ -27,7 +27,6 @@ export class PasswordRecoveryComponent {
   errorButton = false;
   clicked = false;
 
-
   constructor(
     private router: Router,
     private AuthService: AuthService,
@@ -46,6 +45,25 @@ export class PasswordRecoveryComponent {
     this.passwordRecoveryForm.get('newPassword')?.valueChanges.subscribe(
       value => {this.passwordStrengthLevel = this.passwordStrength(value)}
     )
+  }
+
+  // Lógica para reenvio de código de recuperação.
+  canResendCode = false;
+  resendCountdown = 30;
+  private resendTimer?: number;
+
+  private startCodeTimer() {
+    this.canResendCode = false;
+    this.resendCountdown = 30;
+
+    this.resendTimer = window.setInterval(() => {
+      this.resendCountdown--
+
+      if (this.resendCountdown === 0) {
+        this.canResendCode = true;
+        clearInterval(this.resendTimer);
+      }
+    }, 1000);
   }
 
   // Adiciona erro "passwordMismatch" caso senha e confirmação de senha não coincidirem
@@ -130,13 +148,13 @@ export class PasswordRecoveryComponent {
 
   onSubmit () {
     if (this.activeStep === 1) {
-      this.changeStep()
+      this.sendCode()
     } else {
       this.submit()
     }
   }
 
-  changeStep () {
+  sendCode () {
     this.clicked = true;
 
     if (this.emailControl.invalid) {
@@ -149,9 +167,12 @@ export class PasswordRecoveryComponent {
       this.passwordRecoveryForm.value.email
     ).subscribe({
       next: () => {
-        this.toastService.success(`Código de recuperação enviado para o seu email! (Seu código expira em 2 minutos) Código (mock) para testes: 123456`, 10000);
-        this.activeStep = 2;
+        this.toastService.success(`Código de recuperação ${this.activeStep === 2 ? 'reenviado' : 'enviado'} para o seu email! (Seu código expira em 2 minutos) Código (mock) para testes: 123456`, 10000);
         this.errorButton = false;
+        this.startCodeTimer();
+        if (this.activeStep === 1) {
+          this.activeStep = 2;
+        }
       },
       error: (err) => {
         this.toastService.error(err.message);

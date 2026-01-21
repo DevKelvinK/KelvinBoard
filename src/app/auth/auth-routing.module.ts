@@ -7,7 +7,7 @@ import { CreatePasswordComponent } from './pages/create-password/create-password
 import { PasswordRecoveryComponent } from './pages/password-recovery/password-recovery.component';
 
 const routes: Routes = [
-  { path: '', component: LoginComponent },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'create-password', component: CreatePasswordComponent },
   { path: 'password-recovery', component: PasswordRecoveryComponent }
