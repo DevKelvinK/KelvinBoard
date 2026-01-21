@@ -19,7 +19,7 @@ export class ApiMockService {
     },
     {
       email: 'tenhosenha@email.com',
-      password: 'tenhoSenh@123',
+      password: 'tenhoSenha@123',
     },
     {
       email: 'esquecisenha@email.com',
@@ -31,11 +31,11 @@ export class ApiMockService {
     const userFound = this.users.find((user) => user.email === email);
 
     if (!userFound) {
-      return throwError(() => new Error('Email não encontrado.')).pipe(delay(800));
+      return throwError(() => new Error('Usuário não encontrado, digite um email cadastrado.')).pipe(delay(800));
     }
 
     if (!userFound.password) {
-      return throwError(() => new Error('Usuário sem senha cadastrada, click em "Primeiro acesso" abaixo.')).pipe(delay(800));
+      return throwError(() => new Error('Usuário sem senha cadastrada, click em "Crie uma senha".')).pipe(delay(800));
     }
 
     if (userFound.password !== password) {

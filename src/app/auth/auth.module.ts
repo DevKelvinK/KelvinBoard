@@ -9,6 +9,7 @@ import { PasswordRecoveryComponent } from './pages/password-recovery/password-re
 import { DefaultAuthLayoutComponent } from './components/default-auth-layout/default-auth-layout.component';
 import { AuthRoutingModule } from './auth-routing.module';
 import { SharedModule } from '../shared/shared.module';
+import { ToastComponent } from "../shared/components/toast/toast.component";
 
 @NgModule({
   imports: [
@@ -18,7 +19,8 @@ import { SharedModule } from '../shared/shared.module';
     RouterModule,
     SharedModule,
     DefaultAuthLayoutComponent,
-  ],
+    ToastComponent
+],
   declarations: [
     LoginComponent,
     CreatePasswordComponent,

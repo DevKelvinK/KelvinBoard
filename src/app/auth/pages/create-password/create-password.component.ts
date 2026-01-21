@@ -8,6 +8,7 @@ import {
 import { Router } from '@angular/router';
 
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 interface CreatePasswordForm {
   email: FormControl;
@@ -32,6 +33,7 @@ export class CreatePasswordComponent {
   constructor(
     private router: Router,
     private AuthService: AuthService,
+    private toastService: ToastService
   ) {
     this.createPasswordForm = new FormGroup(
       {
@@ -58,11 +60,15 @@ export class CreatePasswordComponent {
     const pass = from.get('newPassword')?.value;
     const passConfirm = from.get('newPasswordConfirm')?.value;
 
-    if (pass !== passConfirm) {
-      return { passwordMismatch: true };
+    if (!pass || !passConfirm) {
+      return null
     }
 
-    return null;
+    if (pass !== passConfirm) {
+      return { passwordMismatch: true }
+    } else {
+      return null;
+    }
   }
 
   // Atualização dinâmica da cor do botão conforme validação dos formulários
@@ -132,24 +138,20 @@ export class CreatePasswordComponent {
       return;
     }
 
-    if (
-      this.createPasswordForm.value.newPassword !==
-      this.createPasswordForm.value.newPasswordConfirm
-    ) {
-      this.errorButton = true;
-      return this.createPasswordForm.setErrors({ passwordMismatch: true });
-    }
-
     this.AuthService.createPassword(
       this.createPasswordForm.value.email,
       this.createPasswordForm.value.code,
       this.createPasswordForm.value.newPassword,
     ).subscribe({
       next: () => {
-        console.log('Senha criada com secesso!');
+        this.toastService.success('Senha criada com sucesso!');
         this.router.navigate(['/login']);
       },
-      error: (err) => console.error(err.message),
+      error: (err) => {
+        this.toastService.error(err.message);
+        this.errorButton = true;
+        this.emailControl.markAsTouched();
+      }
     });
   }
 }

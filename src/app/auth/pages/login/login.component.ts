@@ -3,6 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 interface LoginForm {
   email: FormControl,
@@ -21,7 +22,8 @@ export class LoginComponent {
 
   constructor(
     private router: Router,
-    private AuthService: AuthService
+    private AuthService: AuthService,
+    private toastService: ToastService
   ) {
     this.loginForm = new FormGroup({
       email: new FormControl('', [Validators.required, Validators.email]),
@@ -61,10 +63,14 @@ export class LoginComponent {
       this.loginForm.value.password
     ).subscribe({
       next: () => {
-        console.log("Login realizado");
+        this.toastService.success('Login realizado com sucesso!');
         this.router.navigate(['/dashboard'])
       },
-      error: (err) => console.error(err.message)
+      error: (err) => {
+        this.toastService.error(err.message);
+        this.errorButton = true;
+        this.emailControl.markAsTouched();
+      }
     })
   }
 }

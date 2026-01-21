@@ -3,6 +3,7 @@ import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/fo
 import { Router } from '@angular/router';
 
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 interface PasswordRecoveryForm {
   email: FormControl;
@@ -29,7 +30,8 @@ export class PasswordRecoveryComponent {
 
   constructor(
     private router: Router,
-    private AuthService: AuthService
+    private AuthService: AuthService,
+    private toastService: ToastService
   ) {
     this.passwordRecoveryForm = new FormGroup(
       {
@@ -51,11 +53,15 @@ export class PasswordRecoveryComponent {
     const pass = from.get('newPassword')?.value;
     const passConfirm = from.get('newPasswordConfirm')?.value;
 
-    if (pass !== passConfirm) {
-      return { passwordMismatch: true };
+    if (!pass || !passConfirm) {
+      return null
     }
 
-    return null;
+    if (pass !== passConfirm) {
+      return { passwordMismatch: true }
+    } else {
+      return null;
+    }
   }
 
   // Atualização dinâmica da cor do botão conforme validação dos formulários
@@ -122,7 +128,7 @@ export class PasswordRecoveryComponent {
     }
   }
 
-  changeAction () {
+  onSubmit () {
     if (this.activeStep === 1) {
       this.changeStep()
     } else {
@@ -143,12 +149,15 @@ export class PasswordRecoveryComponent {
       this.passwordRecoveryForm.value.email
     ).subscribe({
       next: () => {
+        this.toastService.success(`Código de recuperação enviado para o seu email! (Seu código expira em 2 minutos) Código (mock) para testes: 123456`, 10000);
         this.activeStep = 2;
         this.errorButton = false;
       },
-      error: () => {
+      error: (err) => {
+        this.toastService.error(err.message);
         this.emailControl.setErrors({ notFound: true });
         this.errorButton = true;
+        this.emailControl.markAsTouched();
       }
     });
 
@@ -163,24 +172,18 @@ export class PasswordRecoveryComponent {
       return;
     }
 
-    if (
-      this.passwordRecoveryForm.value.newPassword !==
-      this.passwordRecoveryForm.value.newPasswordConfirm
-    ) {
-      this.errorButton = true;
-      return this.passwordRecoveryForm.setErrors({ passwordMismatch: true });
-    }
-
     this.AuthService.confirmPasswordReset(
       this.passwordRecoveryForm.value.email,
       this.passwordRecoveryForm.value.code,
       this.passwordRecoveryForm.value.newPassword,
     ).subscribe({
       next: () => {
-        console.log('Nova senha criada com secesso!');
+        this.toastService.success('Nova senha criada com secesso!');
         this.router.navigate(['/login']);
       },
-      error: (err) => console.error(err.message),
+      error: (err) =>  {
+        this.toastService.error(err.message);
+      }
     });
   }
 }
