@@ -1,0 +1,19 @@
+<div class="flex gap-2 py-1 px-3 rounded-2xl text-sm bg-colorGray-600/30">
+  <button
+    type="button"
+    (click)="selectPeriod(7)"
+    [class.active-button]="value === 7"
+    class="px-3 sm:px-5 py-1 rounded-full bg-colorGray-300 text-secondary outline-none hover:bg-secondary hover:text-white focus:outline-none focus:outline-2 focus:outline-secondary duration-300 ease-in-out"
+  >
+    7 dias
+  </button>
+
+  <button
+    type="button"
+    (click)="selectPeriod(30)"
+    [class.active-button]="value === 30"
+    class="px-3 sm:px-5 py-1 rounded-full bg-colorGray-300 text-secondary outline-none hover:bg-secondary hover:text-white focus:outline-none focus:outline-2 focus:outline-secondary duration-300 ease-in-out"
+  >
+    30 dias
+  </button>
+</div>

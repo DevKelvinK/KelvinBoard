@@ -13,10 +13,16 @@ export class DashboardComponent{
     private router: Router
   ) {}
 
+  // Abrir e fechar o sidebar
   isMenuOpen: boolean = false;
-
   closeMenu() {
     this.isMenuOpen = false;
+  }
+
+  // Atualizar os dados do dashboard com base no período selecionado
+  period: 7 | 30 = 7;
+  PeriodChange(period: 7 | 30) {
+    this.period = period;
   }
 
   logout() {
