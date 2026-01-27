@@ -9,8 +9,8 @@ import { PasswordRecoveryComponent } from './pages/password-recovery/password-re
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
-  { path: 'create-password', component: CreatePasswordComponent },
-  { path: 'password-recovery', component: PasswordRecoveryComponent }
+  { path: 'primeiro-acesso', component: CreatePasswordComponent },
+  { path: 'recuperar-senha', component: PasswordRecoveryComponent }
 ]
 
 @NgModule({

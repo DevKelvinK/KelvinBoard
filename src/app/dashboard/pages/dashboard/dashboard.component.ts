@@ -1,16 +1,21 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
 
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { OrdersService } from '../../../core/services/orders/orders.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Order } from '../../../core/models/orders/order.model';
-import { finalize } from 'rxjs';
 
 interface Kpis {
   revenue: number;
   ordersCount: number;
   avgTicket: number;
+}
+
+interface ChartData {
+  days: string[];
+  revenue: number[];
 }
 
 @Component({
@@ -56,6 +61,7 @@ export class DashboardComponent {
       next: (ordersFromSelectedPeriod) => {
         this.allOrders = ordersFromSelectedPeriod
         this.applyUiFilters()
+        this.buildChartData(this.allOrders);
       },
       error: (err) => {
         this.toastService.error(err.message);
@@ -63,6 +69,7 @@ export class DashboardComponent {
     });
   }
 
+  // Aplicar todos os filtros para serem exibidos na UI
   search: string = ''
   sort: 'asc' | 'desc' | null = null;
   filteredOrders: Order[] = [];
@@ -87,14 +94,48 @@ export class DashboardComponent {
     this.kpis = this.calculateKpis(filtered);
   }
 
+  // Lógica para KPIs
   calculateKpis(ordersFromSelectedPeriod: Order[]) {
     const revenue = ordersFromSelectedPeriod.reduce((acc, order) => acc + order.value, 0);
     const ordersCount = ordersFromSelectedPeriod.length;
-    const avgTicket = revenue / ordersCount;
+    const avgTicket = (ordersCount > 0) ? revenue / ordersCount : 0;
 
     return { revenue, ordersCount, avgTicket };
   }
 
+  // Lógica para Gráfico
+  chartData: ChartData = { days: [], revenue: [] };
+  buildChartData(allOrders: Order[]) {
+    const arrDays: string[] = [];
+    const arrRevenue: number[] = []
+
+    const endDate = new Date(2026, 0, 20);
+    const periodInMs = (this.period - 1) * 24 * 60 * 60 * 1000;
+    const startDate = new Date(endDate.getTime() - periodInMs);
+
+    const currentDay = new Date(startDate)
+
+    for (let i = 0; i < this.period; i++) {
+      const labelDay = currentDay.toLocaleDateString('pt-BR')
+      arrDays.push(labelDay);
+
+      let value: number = 0
+
+      allOrders.forEach(order => {
+        const orderDay = order.date.toLocaleDateString('pt-BR')
+        if (labelDay === orderDay) {
+          value += order.value
+        }
+      })
+
+      arrRevenue.push(value) 
+      currentDay.setDate(currentDay.getDate() + 1);
+    }
+
+    this.chartData = { days: arrDays, revenue:arrRevenue }
+  }
+
+  // Lógica para Tabela
   onSearch(searchText: string) {
     this.search = searchText
     this.applyUiFilters();
@@ -103,17 +144,6 @@ export class DashboardComponent {
   onSortToggle() {
     this.sort = this.sort === 'asc' ? 'desc' : 'asc';
     this.applyUiFilters();
-  }
-
-  // Fazer testes
-  test() {
-    this.ordersService.getOrders(this.period).subscribe({
-      next: (orders) => {
-        this.allOrders;
-        this.toastService.success(`Tem: ${orders.length} pedidos.`);
-      },
-      error: (err) => {},
-    });
   }
 
   logout() {
