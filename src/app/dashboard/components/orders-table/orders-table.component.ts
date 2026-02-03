@@ -21,9 +21,22 @@ export class OrdersTableComponent {
   @Input() orders: Order[] = [];
   @Input() period: 7 | 30 = 7
   @Input() isLoading: boolean = false
+  @Input() noClientFound: boolean = false
 
   @Output() search = new EventEmitter<string>();
   @Output() sort = new EventEmitter<void>();
+
+  clientSearch: string = ''
+
+  onSearch(value: string) {
+    this.clientSearch = value;
+    this.search.emit(value);
+  }
+
+  clearSearch() {
+    this.clientSearch = '';
+    this.search.emit('');
+  }
 
   onSortClick() {
     this.sort.emit();

@@ -77,6 +77,7 @@ export class DashboardComponent {
 
   // Aplicar todos os filtros para serem exibidos na UI
   search: string = ''
+  noClientFound = false
   sort: 'asc' | 'desc' | null = null;
   filteredOrders: Order[] = [];
   kpis: Kpis = { revenue: 0, ordersCount: 0, avgTicket: 0 };
@@ -86,6 +87,12 @@ export class DashboardComponent {
 
     if (this.search) {
       filtered = filtered.filter(order => order.client.toLocaleLowerCase().includes(this.search.toLocaleLowerCase()))
+    }
+
+    if (this.allOrders.length && !filtered.length) {
+      this.noClientFound = true 
+    } else {
+      this.noClientFound = false 
     }
 
     if (this.sort) {

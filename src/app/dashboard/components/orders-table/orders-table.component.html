@@ -21,10 +21,11 @@
     <app-base-input
       type="text"
       placeholder="Buscar cliente..."
-      formControlName="search"
       sizePY="py-2"
-      (input)="search.emit($any($event.target).value)"
-    >
+      [value]="clientSearch"
+      (valueChange)="onSearch($event)"
+      [maxLength]="60"
+      >
       <i class="ph ph-magnifying-glass"></i>
     </app-base-input>
   </div>
@@ -60,8 +61,18 @@
       <tbody class="relative divide-y divide-colorGray-600/30">
         @if (isLoading || !orders.length) {
           @if (!orders.length && !isLoading) {
-            <div class="absolute inset-0 z-50 flex justify-center items-center">
-              <span class="text-white font-bold py-3 px-12 rounded-2xl bg-secondary/50">Sem dados no período</span>
+            <div class="absolute inset-0 z-50 flex flex-col justify-center items-center gap-3">
+              <span class="text-white text-center font-bold py-3 px-12 rounded-2xl bg-secondary/50">
+                {{ (noClientFound) ? ('Nenhum cliente encontrado para "' + clientSearch + '"') : "Sem dados no período selecionado" }}
+              </span>
+
+              <button 
+                type="button" 
+                class="py-1 px-6 rounded-xl ring-1 ring-secondary text-secondary bg-white outline-none hover:bg-secondary hover:text-white focus:bg-secondary focus:text-white duration-300 ease-in-out"
+                (click)="clearSearch()"
+                >
+                Limpar busca
+              </button>
             </div>
           }
           @for (_ of skeletonRows; track $index) {

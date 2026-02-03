@@ -1,4 +1,4 @@
-import { Component, forwardRef, Input, Optional, Self } from '@angular/core';
+import { Component, EventEmitter, forwardRef, Input, Optional, Output, Self } from '@angular/core';
 import {
   ControlValueAccessor,
   FormControl,
@@ -33,14 +33,19 @@ export class BaseInputComponent implements ControlValueAccessor {
   @Input() readonly: boolean = false;
   @Input() sizePY: string = 'py-[14px]';
   @Input() isLoading: boolean = false
+  @Input() value: string = '';
+  @Input() maxLength: number | null = null;
 
-  value: string = '';
+  @Output() valueChange = new EventEmitter<string>();
+
   onChange: (value: any) => void = () => {};
   onTouched: () => void = () => {};
 
   onInput(event: Event) {
     const value = (event.target as HTMLInputElement).value;
+    this.value = value;
     this.onChange(value);
+    this.valueChange.emit(value);
   }
 
   writeValue(value: any): void {
